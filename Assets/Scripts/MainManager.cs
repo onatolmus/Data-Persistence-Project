@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text bestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -18,7 +20,8 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +39,10 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        // show the best score on start of the main scene
+        bestScoreText.text = $"Best Score : {MenuManager.Instance.bestScoreName} : {MenuManager.Instance.bestScore}";
+
     }
 
     private void Update()
@@ -55,6 +62,9 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            //Debug.Log(MenuManager.Instance.username);
+            // change the below line
+            //bestScoreText.text = $"Best Score : {MenuManager.Instance.username} : {m_Points}";
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -66,11 +76,32 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        // save best score and username if it is higher than the last best score
+        if (m_Points > MenuManager.Instance.bestScore)
+        {
+            MenuManager.Instance.bestScore = m_Points;
+            MenuManager.Instance.bestScoreName = MenuManager.Instance.username;
+
+        }
+        bestScoreText.text = $"Best Score : {MenuManager.Instance.bestScoreName} : {MenuManager.Instance.bestScore}";
+
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        // save the best score on game over
+        bestScoreText.text = $"Best Score : {MenuManager.Instance.bestScoreName} : {MenuManager.Instance.bestScore}";
+        MenuManager.Instance.SaveBestScoreAndName();
     }
+
+    //public void ReadInputOnGameOver(string s)
+    //{
+    //    inputText = s;
+    //    bestScoreText.text = $"Score : {inputText} : {m_Points}";
+    //    Debug.Log(inputText);
+    //}
 }
